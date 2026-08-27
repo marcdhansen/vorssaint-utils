@@ -44,7 +44,9 @@ enum SelfTest {
         }
 
         if let smc = SMCClient() {
-            let keys = smc.keys { $0.hasPrefix("Tp") || $0.hasPrefix("Te") || $0.hasPrefix("Tg") }
+            let keys = smc.keys {
+                $0.hasPrefix("Tp") || $0.hasPrefix("Te") || $0.hasPrefix("TC") || TemperatureSensorSelector.isGPUTemperatureKey($0)
+            }
             if keys.isEmpty {
                 warnings.append("no SMC temperature keys")
             } else if keys.compactMap({ smc.readValue($0) }).isEmpty {
@@ -164,7 +166,8 @@ enum SensorDump {
             exit(1)
         }
         let keys = smc.keys { name in
-            name.hasPrefix("Tp") || name.hasPrefix("Te") || name.hasPrefix("Tg")
+            name.hasPrefix("Tp") || name.hasPrefix("Te") || name.hasPrefix("TC")
+                || TemperatureSensorSelector.isGPUTemperatureKey(name)
                 || name.range(of: "^TB[0-9]T$", options: .regularExpression) != nil
         }
         let cpuPlatform = TemperatureSensorSelector.currentPlatform()
@@ -175,7 +178,7 @@ enum SensorDump {
             let component: String
             if key.name.hasPrefix("TB") {
                 component = "battery"
-            } else if key.name.hasPrefix("Tg") {
+            } else if TemperatureSensorSelector.isGPUTemperatureKey(key.name) {
                 component = "gpu"
             } else if hasCPUCoreSet {
                 component = TemperatureSensorSelector.isCPUCoreKey(key.name, platform: cpuPlatform) ? "cpu-core" : "cpu-aux"

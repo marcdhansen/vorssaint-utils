@@ -39,7 +39,7 @@ else
     BUILD_CONFIGURATION="release"
 fi
 FAN_HELPER_ID="$APP_BUNDLE_ID.fan-control"
-TARGET="arm64-apple-macosx14.0"
+TARGET="$(uname -m)-apple-macosx14.0"
 ENTITLEMENTS="Resources/Vorssaint.entitlements"
 LEGACY_IDENTITY="Vorssaint Utils Signing"
 
